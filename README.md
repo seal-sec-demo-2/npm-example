@@ -44,6 +44,15 @@ http://localhost:3001/?name=Hacker&settings[view%20options][outputFunctionName]=
 | `json5` | 0.5.1 | CVE-2022-46175 | Prototype Pollution |
 | `lodash` | 4.17.5 | CVE-2019-10744 | Prototype Pollution |
 
+## Required Secrets
+
+Before running the workflows, configure the following secrets in your GitHub repository (**Settings > Secrets and variables > Actions**):
+
+| Secret | Description |
+|---|---|
+| `SEAL_TOKEN` | Your Seal Security access token, generated during onboarding |
+| `NGROK_TOKEN` | Your ngrok authtoken, used only to expose the app publicly for browser testing |
+
 ## Remediation
 
 Running the **Seal Security Remediation** GitHub Actions workflow replaces the vulnerable packages with Seal's patched versions — without changing the declared version ranges in `package.json`.
