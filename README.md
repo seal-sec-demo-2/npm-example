@@ -47,3 +47,5 @@ http://localhost:3001/?name=Hacker&settings[view%20options][outputFunctionName]=
 ## Remediation
 
 Running the **Seal Security Remediation** GitHub Actions workflow replaces the vulnerable packages with Seal's patched versions — without changing the declared version ranges in `package.json`.
+
+> **Note:** The workflow uses [ngrok](https://ngrok.com/) solely to expose the running application to a public URL for live browser-based testing of the exploit. ngrok is **not** required for Seal to scan or remediate vulnerabilities — the `seal fix` step runs independently of it.
