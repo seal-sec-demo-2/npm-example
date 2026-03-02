@@ -1,0 +1,54 @@
+name: Seal Security Remediation
+
+on:
+  workflow_dispatch:
+    inputs:
+      fix_mode:
+        description: 'Fix mode: remote (UI-approved), local (actions file), or all (everything available)'
+        required: true
+        default: 'remote'
+        type: choice
+        options:
+          - remote
+          - local
+          - all
+
+jobs:
+  remediate-and-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Dependencies
+        run: npm install --no-audit
+
+      - name: Seal Security - Fix Vulnerabilities
+        uses: seal-community/cli-action@latest
+        with:
+          mode: fix
+          fix_mode: ${{ github.event.inputs.fix_mode || 'remote' }}
+          target: package.json
+          token: ${{ secrets.SEAL_TOKEN }}
+
+      - name: Start Application
+        run: |
+          wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+          tar xzf ngrok-v3-stable-linux-amd64.tgz
+          ./ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
+          ./ngrok http --url=sealtest.ngrok.dev 3001 &
+          sleep 3
+          echo "App:     https://sealtest.ngrok.dev"
+          echo ""
+          echo "Normal:  https://sealtest.ngrok.dev/?name=alice"
+          echo "Exploit: https://sealtest.ngrok.dev/?name=Hacker&settings[view%20options][outputFunctionName]=x;setTimeout(function()%7Bprocess.exit(1)%7D,500);s"
+          echo ""
+          echo "Paste the exploit URL in the browser to test CVE-2022-29078"
+          npm run start
